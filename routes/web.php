@@ -71,5 +71,13 @@ Route::post('/doctors', [DoctorController::class, 'storeWithUser'])->name('docto
 Route::resource('doctors', DoctorController::class);
 
 
+// use App\Http\Controllers\DashboardController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+
+
 
 
