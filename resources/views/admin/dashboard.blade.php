@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediCareHub - Plateforme Médicale Intelligente</title>
+    <title>MediConnectHub - Plateforme Médicale Intelligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -82,7 +82,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <i class="fas fa-heartbeat text-3xl"></i>
-                <h1 class="text-2xl font-bold">MediCareHub</h1>
+                <h1 class="text-2xl font-bold">MediConnectHub</h1>
             </div>
             
             <div class="flex items-center space-x-4">
@@ -93,8 +93,8 @@
                     </button>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white">
-                    <span class="font-medium">Marie Dupont</span>
+                    <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->firstname . ' ' . Auth::user()->lastname) . '&background=0d6efd&color=fff' }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white">
+                    <span class="font-medium">{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</span>
                 </div>
             </div>
         </div>
@@ -113,13 +113,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
+                        <a href="{{ route('appointments.create') }}" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
                             <i class="fas fa-calendar-check text-lg"></i>
                             <span>Prendre RDV</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
+                        <a href="{{ route('medical-records.index') }}" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
                             <i class="fas fa-file-medical text-lg"></i>
                             <span>Dossier médical</span>
                         </a>
@@ -142,6 +142,12 @@
                             <span>Paramètres</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('users.index') }}" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-users text-lg"></i>
+                            <span>Gérer les utilisateurs</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             
@@ -161,8 +167,8 @@
             <div class="gradient-bg text-white rounded-xl p-6 mb-6 shadow-lg">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
-                        <h2 class="text-2xl font-bold mb-2">Bonjour, Marie Dupont</h2>
-                        <p class="opacity-90">Bienvenue sur votre espace personnel MediCareHub</p>
+                        <h2 class="text-2xl font-bold mb-2">Bonjour, {{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</h2>
+                        <p class="opacity-90">Bienvenue sur votre espace personnel MediConnectHub</p>
                     </div>
                     <button id="arrivalBtn" class="mt-4 md:mt-0 bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg hover:bg-gray-100 transition flex items-center space-x-2">
                         <i class="fas fa-check-circle"></i>
@@ -239,44 +245,19 @@
                 <!-- Medical File Card -->
                 <div class="medical-card bg-white rounded-xl shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-lg text-gray-800">Dossier médical</h3>
+                        <h3 class="font-semibold text-lg text-gray-800">Dossiers médicaux</h3>
                         <div class="text-blue-600">
-                            <i class="fas fa-shield-alt"></i>
+                            <i class="fas fa-file-medical"></i>
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-green-100 p-2 rounded-full">
-                                <i class="fas fa-allergies text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Allergies</p>
-                                <p class="text-xs text-gray-500">2 enregistrées</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-purple-100 p-2 rounded-full">
-                                <i class="fas fa-pills text-purple-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Traitements</p>
-                                <p class="text-xs text-gray-500">3 actifs</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-red-100 p-2 rounded-full">
-                                <i class="fas fa-dna text-red-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium">Antécédents</p>
-                                <p class="text-xs text-gray-500">Complet</p>
-                            </div>
-                        </div>
+                        <p class="text-sm font-medium">Total des dossiers enregistrés :</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $medicalRecords->count() }}</p>
                     </div>
-                    <button class="w-full mt-6 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition flex items-center justify-center space-x-2 text-sm">
-                        <i class="fas fa-edit"></i>
-                        <span>Mettre à jour</span>
-                    </button>
+                    <a href="{{ route('medical-records.index') }}" class="w-full mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2 text-sm">
+                        <i class="fas fa-eye"></i>
+                        <span>Gérer les dossiers médicaux</span>
+                    </a>
                 </div>
                 
                 <!-- Pharmacy Order Card -->
@@ -502,7 +483,7 @@
         });
     </script>
 </body>
-</html> --}}
+</html>
 
 
 

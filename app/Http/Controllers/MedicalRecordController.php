@@ -5,59 +5,86 @@ namespace App\Http\Controllers;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MedicalRecordController extends Controller
 {
     public function index()
     {
-        $records = MedicalRecord::with('patient')->get();
-        return view('medical-records.index', compact('records'));
+        try {
+            $records = MedicalRecord::with('patient')->get();
+            Log::info('Dossiers médicaux récupérés : ' . $records->count());
+            return view('medical-records.index', compact('records'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la récupération des dossiers médicaux : ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('error', 'Une erreur est survenue lors de la récupération des dossiers médicaux.');
+        }
     }
 
     public function create()
     {
-        $patients = Patient::all();
-        return view('medical-records.create', compact('patients'));
+        try {
+            $patients = Patient::all();
+            return view('medical-records.create', compact('patients'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la création d\'un dossier médical : ' . $e->getMessage());
+            return redirect()->route('medical-records.index')->with('error', 'Une erreur est survenue.');
+        }
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'diagnosis' => 'required|string',
-            'treatment' => 'nullable|string',
-        ]);
-
-        MedicalRecord::create($validated);
-        return redirect()->route('medical-records.index')->with('success', 'Dossier médical enregistré.');
+        try {
+            $validated = $request->validate(MedicalRecord::rules());
+            MedicalRecord::create($validated);
+            return redirect()->route('medical-records.index')->with('success', 'Dossier médical créé avec succès.');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la création du dossier médical : ' . $e->getMessage());
+            return back()->with('error', 'Une erreur est survenue lors de la création du dossier médical.');
+        }
     }
 
     public function show(MedicalRecord $medicalRecord)
     {
-        return view('medical-records.show', compact('medicalRecord'));
+        try {
+            return view('medical-records.show', compact('medicalRecord'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'affichage du dossier médical : ' . $e->getMessage());
+            return redirect()->route('medical-records.index')->with('error', 'Une erreur est survenue.');
+        }
     }
 
     public function edit(MedicalRecord $medicalRecord)
     {
-        $patients = Patient::all();
-        return view('medical-records.edit', compact('medicalRecord', 'patients'));
+        try {
+            $patients = Patient::all();
+            return view('medical-records.edit', compact('medicalRecord', 'patients'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la modification du dossier médical : ' . $e->getMessage());
+            return redirect()->route('medical-records.index')->with('error', 'Une erreur est survenue.');
+        }
     }
 
     public function update(Request $request, MedicalRecord $medicalRecord)
     {
-        $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'diagnosis' => 'required|string',
-            'treatment' => 'nullable|string',
-        ]);
-
-        $medicalRecord->update($validated);
-        return redirect()->route('medical-records.index')->with('success', 'Dossier mis à jour.');
+        try {
+            $validated = $request->validate(MedicalRecord::rules());
+            $medicalRecord->update($validated);
+            return redirect()->route('medical-records.index')->with('success', 'Dossier médical mis à jour avec succès.');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour du dossier médical : ' . $e->getMessage());
+            return back()->with('error', 'Une erreur est survenue lors de la mise à jour du dossier médical.');
+        }
     }
 
     public function destroy(MedicalRecord $medicalRecord)
     {
-        $medicalRecord->delete();
-        return redirect()->route('medical-records.index')->with('success', 'Dossier supprimé.');
+        try {
+            $medicalRecord->delete();
+            return redirect()->route('medical-records.index')->with('success', 'Dossier médical supprimé avec succès.');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la suppression du dossier médical : ' . $e->getMessage());
+            return back()->with('error', 'Une erreur est survenue lors de la suppression du dossier médical.');
+        }
     }
 }

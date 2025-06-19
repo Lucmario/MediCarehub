@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Models\Doctor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
@@ -17,19 +19,38 @@ class AppointmentController extends Controller
     public function create()
     {
         $patients = Patient::all();
-        return view('appointments.create', compact('patients'));
+        $doctors = Doctor::with('user')->get();
+        $doctorsBySpecialty = $doctors->groupBy(function($doctor) {
+            return $doctor->specialty ?? 'Autre';
+        });
+        return view('appointments.create', compact('patients', 'doctorsBySpecialty'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
+            'doctor_id' => 'required|exists:doctors,id',
             'date' => 'required|date',
+            'heure' => 'required',
             'reason' => 'nullable|string',
         ]);
 
-        Appointment::create($validated);
-        return redirect()->route('appointments.index')->with('success', 'Rendez-vous enregistré.');
+        $user = Auth::user();
+        $patient = $user->patient ?? null;
+        if (!$patient) {
+            return back()->withErrors(['error' => 'Impossible de trouver le patient connecté.']);
+        }
+
+        $appointment = new Appointment();
+        $appointment->patient_id = $patient->id;
+        $appointment->doctor_id = $validated['doctor_id'];
+        $appointment->date = $validated['date'];
+        $appointment->heure = $validated['heure'];
+        $appointment->reason = $validated['reason'] ?? null;
+        $appointment->statut = 'pending';
+        $appointment->save();
+
+        return redirect()->route('appointments.index')->with('success', 'Rendez-vous enregistré avec succès !');
     }
 
     public function show(Appointment $appointment)

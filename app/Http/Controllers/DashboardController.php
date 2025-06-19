@@ -2,29 +2,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Patient;
+use App\Models\Appointment;
+use App\Models\Consultation;
+use App\Models\MedicalRecord;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Simulations de données
-        $rdv = [
-            'medecin' => 'Dr. Jean Martin',
-            'date' => '15 Juin 2023',
-            'heure' => '14:30',
-        ];
+        $user = Auth::user();
+        $patient = Patient::where('user_id', $user->id)->first();
 
-        $dossier = [
-            'allergies' => 2,
-            'traitements' => 3,
-            'antecedents' => 'complet',
-        ];
+        // Récupérer les rendez-vous, consultations et dossiers médicaux du patient
+        $appointments = $patient ? $patient->appointments()->latest()->take(5)->get() : collect();
+        $consultations = $patient ? $patient->consultations()->latest()->take(5)->get() : collect();
+        $medicalRecords = $patient ? MedicalRecord::where('patient_id', $patient->id)->latest()->take(5)->get() : collect();
 
-        $pharmacie = [
-            'medicaments' => 2,
-        ];
-
-        return view('dashboard', compact('rdv', 'dossier', 'pharmacie'));
+        return view('dashboard', compact('user', 'patient', 'appointments', 'consultations', 'medicalRecords'));
     }
 }
 

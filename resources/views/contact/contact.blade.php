@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Contact - MediCareHub')
+@section('title', 'Contact - MediConnectHub')
 
 @section('content')
 <section class="py-16 px-6 bg-gray-100 text-center">
     <h1 class="text-4xl font-bold mb-6 text-blue-800">Contactez-nous</h1>
-    <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">Vous avez une question, une suggestion ou besoin d’assistance ? Remplissez le formulaire ci-dessous.</p>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">Vous avez une question, une suggestion ou besoin d'assistance ? Remplissez le formulaire ci-dessous.</p>
 
     <form method="POST" action="#" class="max-w-xl mx-auto bg-white p-8 rounded shadow">
         @csrf

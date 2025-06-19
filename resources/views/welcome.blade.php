@@ -1,144 +1,37 @@
-{{-- <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediCareHub</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .hero-bg {
-            background-image: url('https://images.unsplash.com/photo-1588776814546-d626a1a48fcd?auto=format&fit=crop&w=1470&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Navbar -->
-    <nav class="bg-white shadow">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center space-x-2">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo MediCareHub" class="h-10 w-auto">
-                <span class="text-xl font-bold text-blue-600">MediCareHub</span>
-            </a>
-            <div class="space-x-4">
-                <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium">Fonctionnalités</a>
-                <a href="#doctors" class="text-gray-700 hover:text-blue-600 font-medium">Médecins</a>
-                <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
-                <a href="{{ route('login') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Se connecter</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-bg h-screen flex items-center justify-center text-white">
-        <div class="text-center px-6">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">La santé connectée à portée de main</h1>
-            <p class="text-lg md:text-2xl mb-6">Prenez rendez-vous, consultez en ligne, gérez vos traitements facilement avec MediCareHub.</p>
-            <a href="{{ route('register') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded shadow hover:bg-blue-700 transition">Rejoignez-nous</a>
-        </div>
-    </section>
-
-    <!-- Fonctionnalités -->
-    <section id="features" class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">Nos fonctionnalités</h2>
-            <div class="grid md:grid-cols-3 gap-12">
-                <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
-                    <h3 class="text-xl font-semibold mb-2">Consultation à distance</h3>
-                    <p>Consultez un médecin sans vous déplacer via notre plateforme sécurisée de télémédecine.</p>
-                </div>
-                <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
-                    <h3 class="text-xl font-semibold mb-2">Ordonnances numériques</h3>
-                    <p>Recevez vos prescriptions en ligne, prêtes à être utilisées à la pharmacie ou imprimées.</p>
-                </div>
-                <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
-                    <h3 class="text-xl font-semibold mb-2">Paiements intégrés</h3>
-                    <p>Payez vos consultations et médicaments en ligne ou directement à l’hôpital.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Docteurs -->
-    <section id="doctors" class="py-20 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">Nos médecins</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                @foreach ($doctors as $doctor)
-                    <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition text-center">
-                        <img src="{{ asset('storage/'.$doctor->user->avatar) }}" alt="Photo de {{ $doctor->user->firstname }}" class="w-24 h-24 rounded-full object-cover mx-auto mb-4">
-                        <h3 class="text-xl font-semibold">{{ $doctor->user->firstname }} {{ $doctor->user->lastname }}</h3>
-                        <p class="text-blue-600 font-medium">{{ $doctor->specialty }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" class="py-20 bg-white">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-4">Une question ?</h2>
-            <p class="mb-6">Contactez notre équipe pour en savoir plus sur MediCareHub.</p>
-            <a href="mailto:contact@medicarehub.com" class="px-6 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700">Nous contacter</a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; {{ date('Y') }} MediCareHub. Tous droits réservés.</p>
-        </div>
-    </footer>
-
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>MediCareHub - Bienvenue</title>
+  <title>MediConnectHub - Bienvenue</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- Alpine.js pour le menu mobile -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
   <!-- AOS (Animate On Scroll) -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
   <style>
-    .hero-bg {
-      background-image: url('https://images.unsplash.com/photo-1588776814546-d626a1a48fcd?auto=format&fit=crop&w=1470&q=80');
-      background-size: cover;
-      background-position: center;
-    }
+      .hero-bg {
+    background-image: url('https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=1500&q=80');
+    background-size: cover;
+    background-position: center;
+  }
   </style>
 </head>
-
 <body class="bg-gray-100 text-gray-800 font-sans" x-data="{ open: false }">
 
   <!-- Navbar -->
   <header class="bg-white shadow fixed w-full z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-4 py-4">
       <div class="flex items-center space-x-3">
-        <img src="/images/logo.png" alt="Logo MediCareHub" class="h-10 w-auto">
-        <span class="text-2xl font-bold text-blue-800">MediCareHub</span>
+        <img src="/images/logo.png" alt="Logo MediConnectHub" class="h-10 w-auto">
+        <span class="text-2xl font-bold text-blue-800">MediConnectHub</span>
       </div>
-
       <!-- Menu desktop -->
       <nav class="hidden md:flex space-x-4 items-center">
         <a href="#services" class="text-gray-700 hover:text-blue-700 font-medium">Services</a>
@@ -151,13 +44,11 @@
           <i class="bi bi-person-plus"></i> S'inscrire
         </a>
       </nav>
-
       <!-- Burger menu -->
       <button class="md:hidden text-2xl text-blue-800" @click="open = !open" aria-label="Menu mobile">
         <i :class="open ? 'bi bi-x' : 'bi bi-list'"></i>
       </button>
     </div>
-
     <!-- Menu mobile -->
     <div class="md:hidden" x-show="open" @click.outside="open = false" x-transition>
       <div class="px-6 py-4 space-y-2 bg-white shadow">
@@ -177,7 +68,7 @@
   <!-- Hero Section -->
   <section class="hero-bg h-screen flex items-center justify-center text-white pt-20">
     <div class="bg-blue-900 bg-opacity-80 p-10 rounded-xl text-center max-w-3xl" data-aos="fade-up">
-      <h1 class="text-5xl font-extrabold mb-4">Bienvenue sur <span class="text-teal-300">MediCareHub</span></h1>
+      <h1 class="text-5xl font-extrabold mb-4">Bienvenue sur <span class="text-teal-300">MediConnectHub</span></h1>
       <p class="text-lg mb-6">Plateforme de santé connectée pour téléconsultations, ordonnances numériques et suivi patient.</p>
       <div class="flex justify-center gap-4 flex-wrap">
         <a href="{{ route('login') }}" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-6 rounded shadow-md">
@@ -190,11 +81,60 @@
     </div>
   </section>
 
+  <!-- Comment ça marche -->
+  <section class="py-16 px-6 bg-white" data-aos="fade-up">
+    <h2 class="text-3xl font-bold text-center mb-10 text-blue-800">Comment ça marche ?</h2>
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      <div class="bg-blue-50 p-6 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center">
+        <span class="text-4xl text-blue-600 mb-2"><i class="bi bi-calendar-check"></i></span>
+        <h3 class="text-lg font-semibold mb-1">Prise de rendez-vous</h3>
+        <p class="text-gray-600 text-sm">Réservez un créneau en ligne, recevez une confirmation immédiate.</p>
+      </div>
+      <div class="bg-teal-50 p-6 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center">
+        <span class="text-4xl text-teal-600 mb-2"><i class="bi bi-camera-video"></i></span>
+        <h3 class="text-lg font-semibold mb-1">Téléconsultation</h3>
+        <p class="text-gray-600 text-sm">Consultez votre médecin à distance, accédez à votre dossier médical sécurisé.</p>
+      </div>
+      <div class="bg-green-50 p-6 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center">
+        <span class="text-4xl text-green-600 mb-2"><i class="bi bi-capsule"></i></span>
+        <h3 class="text-lg font-semibold mb-1">Ordonnance & pharmacie</h3>
+        <p class="text-gray-600 text-sm">Recevez une ordonnance numérique, retirez vos médicaments en pharmacie.</p>
+      </div>
+      <div class="bg-yellow-50 p-6 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center">
+        <span class="text-4xl text-yellow-600 mb-2"><i class="bi bi-credit-card"></i></span>
+        <h3 class="text-lg font-semibold mb-1">Paiement sécurisé</h3>
+        <p class="text-gray-600 text-sm">Payez en ligne via FedaPay ou sur place, confirmation instantanée.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section rôles -->
+  <section class="py-16 px-6 bg-gray-100" data-aos="fade-up">
+    <h2 class="text-3xl font-bold text-center mb-10 text-blue-800">Accès rapide selon votre profil</h2>
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <a href="{{ route('register.form', ['role' => 'patient']) }}" class="bg-blue-50 hover:bg-blue-100 border border-blue-200 p-8 rounded-lg shadow flex flex-col items-center transition">
+        <span class="text-4xl text-blue-600 mb-2"><i class="bi bi-person"></i></span>
+        <span class="font-semibold text-blue-800">Patient</span>
+        <span class="text-xs text-gray-500 mt-2">Prendre RDV, consulter, payer</span>
+      </a>
+      <a href="{{ route('register.form', ['role' => 'doctor']) }}" class="bg-teal-50 hover:bg-teal-100 border border-teal-200 p-8 rounded-lg shadow flex flex-col items-center transition">
+        <span class="text-4xl text-teal-600 mb-2"><i class="bi bi-stethoscope"></i></span>
+        <span class="font-semibold text-teal-800">Médecin</span>
+        <span class="text-xs text-gray-500 mt-2">Accéder aux dossiers, prescrire</span>
+      </a>
+      <a href="{{ route('register.form', ['role' => 'pharmacist']) }}" class="bg-green-50 hover:bg-green-100 border border-green-200 p-8 rounded-lg shadow flex flex-col items-center transition">
+        <span class="text-4xl text-green-600 mb-2"><i class="bi bi-capsule"></i></span>
+        <span class="font-semibold text-green-800">Pharmacien</span>
+        <span class="text-xs text-gray-500 mt-2">Valider et délivrer les ordonnances</span>
+      </a>
+    </div>
+  </section>
+
   <!-- À propos -->
   <section id="about" class="py-16 px-6 bg-white text-center" data-aos="fade-up">
-    <h2 class="text-3xl font-bold mb-6 text-blue-800">À propos de MediCareHub</h2>
+    <h2 class="text-3xl font-bold mb-6 text-blue-800">À propos de MediConnectHub</h2>
     <p class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed">
-      MediCareHub est une solution numérique innovante qui facilite l’accès aux soins grâce à la téléconsultation, la gestion électronique des ordonnances et le suivi médical personnalisé.
+      MediConnectHub est une solution numérique innovante qui facilite l'accès aux soins grâce à la téléconsultation, la gestion électronique des ordonnances et le suivi médical personnalisé.
     </p>
   </section>
 
@@ -220,19 +160,39 @@
     </div>
   </section>
 
-  <!-- Nos Docteurs -->
+  <!-- Nos Docteurs (Carrousel Swiper) -->
   <section id="doctors" class="py-16 px-6 bg-white" data-aos="fade-up">
     <div class="max-w-7xl mx-auto text-center">
       <h2 class="text-3xl font-bold mb-10 text-blue-800">Nos Docteurs</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        @foreach ($doctors as $doctor)
-        <div class="bg-gray-100 rounded-lg p-6 shadow hover:shadow-lg transition">
-          <div class="text-xl font-semibold text-teal-700">{{ $doctor->user->firstname }} {{ $doctor->user->lastname }}</div>
-          <div class="text-sm text-gray-500">{{ $doctor->specialty }}</div>
-          <p class="mt-4 text-gray-700 text-sm">{{ $doctor->bio }}</p>
-          <p class="mt-2 text-gray-600">📞 {{ $doctor->phone ?? 'Non renseigné' }}</p>
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          @foreach ($doctors as $doctor)
+          <div class="swiper-slide flex justify-center">
+            <div class="bg-gray-100 rounded-lg p-6 shadow hover:shadow-lg transition w-full max-w-xs">
+              <div class="text-xl font-semibold text-teal-700 mb-1">
+                {{ $doctor->user->firstname }} {{ $doctor->user->lastname }}
+              </div>
+              <div class="text-sm text-gray-500 mb-2">
+                @if(is_array($doctor->specialty) || is_object($doctor->specialty))
+                  @foreach((array)$doctor->specialty as $spec)
+                    <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ $spec }}</span>
+                  @endforeach
+                @else
+                  @foreach(explode(',', $doctor->specialty) as $spec)
+                    <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ trim($spec) }}</span>
+                  @endforeach
+                @endif
+              </div>
+              <p class="mt-2 text-gray-700 text-sm">{{ $doctor->bio }}</p>
+              <p class="mt-2 text-gray-600">📞 {{ $doctor->phone ?? 'Non renseigné' }}</p>
+            </div>
+          </div>
+          @endforeach
         </div>
-        @endforeach
+        <!-- Pagination & navigation -->
+        <div class="swiper-pagination mt-4"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
       </div>
     </div>
   </section>
@@ -247,7 +207,7 @@
 
   <!-- Footer -->
   <footer class="bg-blue-900 text-white py-6 text-center">
-    <p>&copy; {{ date('Y') }} MediCareHub. Tous droits réservés.</p>
+    <p>&copy; {{ date('Y') }} MediConnectHub. Tous droits réservés.</p>
     <div class="mt-2 text-sm text-blue-200">
       <a href="#" class="hover:underline mx-2">Conditions d'utilisation</a> |
       <a href="#" class="hover:underline mx-2">Politique de confidentialité</a> |
@@ -255,13 +215,23 @@
     </div>
   </footer>
 
-  <!-- Init AOS -->
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Init AOS & Swiper -->
   <script>
-    AOS.init({
-      duration: 1000,
-      once: true
+    AOS.init({ duration: 1000, once: true });
+    var swiper = new Swiper(".mySwiper", {
+      slidesPerView: 1,
+      spaceBetween: 30,
+      loop: true,
+      pagination: { el: ".swiper-pagination", clickable: true },
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+      breakpoints: {
+        640: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 }
+      }
     });
   </script>
-
 </body>
 </html>

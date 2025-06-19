@@ -72,4 +72,65 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Utilisateur supprimé.');
     }
+
+    // Inscription patient
+    public function registerPatient(Request $request)
+    {
+        $request->validate([
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed|min:6',
+        ]);
+        $user = User::create([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => 1, // ID du rôle patient
+        ]);
+        // Ajoute ici la logique pour créer le patient si besoin
+        return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');
+    }
+
+    // Inscription médecin
+    public function registerDoctor(Request $request)
+    {
+        $request->validate([
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'email' => 'required|email|unique:users',
+            'specialty' => 'required',
+            'password' => 'required|confirmed|min:6',
+        ]);
+        $user = User::create([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => 2, // ID du rôle médecin
+        ]);
+        // Ajoute ici la logique pour créer le médecin (Doctor::create...)
+        return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');
+    }
+
+    // Inscription pharmacien/caissier
+    public function registerPharmacist(Request $request)
+    {
+        $request->validate([
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed|min:6',
+        ]);
+        $user = User::create([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => 3, // ID du rôle pharmacien/caissier
+        ]);
+        // Ajoute ici la logique pour créer le pharmacien/caissier si besoin
+        return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');
+    }
 }
