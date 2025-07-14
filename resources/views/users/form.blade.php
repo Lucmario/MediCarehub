@@ -15,14 +15,19 @@
 
 <div class="mb-3">
     <label>Rôle</label>
-    <select name="role_id" class="form-control" required>
-        <option value="">-- Choisir un rôle --</option>
-        @foreach($roles as $role)
-            <option value="{{ $role->id }}" {{ (old('role_id', $user->role_id ?? '') == $role->id) ? 'selected' : '' }}>
-                {{ $role->name }}
-            </option>
-        @endforeach
-    </select>
+    @if(isset($user) && isset($adminEmail) && $user->email === $adminEmail)
+        <input type="text" class="form-control" value="Admin" readonly>
+        <input type="hidden" name="role_id" value="{{ $user->role_id }}">
+    @else
+        <select name="role_id" class="form-control" required>
+            <option value="">-- Choisir un rôle --</option>
+            @foreach($roles as $role)
+                <option value="{{ $role->id }}" {{ (old('role_id', $user->role_id ?? '') == $role->id) ? 'selected' : '' }}>
+                    {{ $role->name }}
+                </option>
+            @endforeach
+        </select>
+    @endif
 </div>
 
 @if (!isset($user))

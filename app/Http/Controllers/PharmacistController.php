@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pharmacist;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PharmacistController extends Controller
 {
@@ -57,5 +58,42 @@ class PharmacistController extends Controller
     {
         $pharmacist->delete();
         return redirect()->route('pharmacists.index')->with('success', 'Pharmacien supprimé.');
+    }
+
+    public function dashboardPharmacist()
+    {
+        $user = Auth::user();
+        $pharmacist = $user->pharmacist ?? null;
+        $stats = [
+            'to_validate' => 0,
+            'delivered' => 0,
+            'patients' => 0,
+        ];
+        $pendingPrescriptions = collect();
+        $deliveredPrescriptions = collect();
+        $recentPatients = collect();
+        if ($pharmacist) {
+            $pendingPrescriptions = \App\Models\Prescription::whereNull('delivered_at')->orderByDesc('id')->take(10)->get();
+            $deliveredPrescriptions = \App\Models\Prescription::whereNotNull('delivered_at')->orderByDesc('delivered_at')->take(10)->get();
+            $stats['to_validate'] = $pendingPrescriptions->count();
+            $stats['delivered'] = \App\Models\Prescription::whereNotNull('delivered_at')->count();
+            $stats['patients'] = \App\Models\Prescription::whereNotNull('delivered_at')->distinct('consultation_id')->count('consultation_id');
+            $recentPatients = \App\Models\Patient::whereIn('id',
+                \App\Models\Consultation::whereIn('id', $deliveredPrescriptions->pluck('consultation_id'))
+                ->pluck('patient_id')->unique()
+            )->with('user')->get();
+        }
+        return view('pharmacist.dashboard', compact('stats', 'pendingPrescriptions', 'deliveredPrescriptions', 'recentPatients'));
+    }
+
+    public function history()
+    {
+        $user = Auth::user();
+        $pharmacist = $user->pharmacist ?? null;
+        $deliveredPrescriptions = collect();
+        if ($pharmacist) {
+            $deliveredPrescriptions = \App\Models\Prescription::whereNotNull('delivered_at')->orderByDesc('delivered_at')->get();
+        }
+        return view('pharmacist.history', compact('deliveredPrescriptions'));
     }
 }

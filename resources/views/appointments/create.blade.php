@@ -5,6 +5,18 @@
         <div class="col-md-8">
             <div class="card shadow p-4">
                 <h2 class="mb-4 text-center">Prendre un rendez-vous</h2>
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form method="POST" action="{{ route('appointments.store') }}">
                     @csrf
                     <div class="mb-3">
@@ -14,7 +26,7 @@
                             @foreach($doctorsBySpecialty as $specialty => $doctors)
                                 <optgroup label="{{ $specialty }}">
                                     @foreach($doctors as $doctor)
-                                        <option value="{{ $doctor->id }}">Dr. {{ $doctor->user->firstname }} {{ $doctor->user->lastname }}</option>
+                                        <option value="{{ $doctor->id }}">Dr. {{ $doctor->user->firstname }} {{ $doctor->user->lastname }} ({{ $specialty }})</option>
                                     @endforeach
                                 </optgroup>
                             @endforeach
@@ -25,7 +37,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="date" class="form-label">Date</label>
-                        <input type="date" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date') }}" required>
+                        <input type="date" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" required>
                         @error('date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

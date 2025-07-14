@@ -29,6 +29,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
                     @guest
                         <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Connexion</a></li>
+                        <li class="nav-item"><a class="nav-link text-danger" href="{{ route('admin.login') }}"><i class="bi bi-shield-lock"></i> Admin</a></li>
                         <li class="nav-item"><a class="btn btn-primary ms-2" href="{{ route('select.role') }}">S'inscrire</a></li>
                     @else
                         <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Tableau de bord</a></li>
@@ -90,7 +91,7 @@
     </script>
 
     <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-3">
+    <footer class="bg-primary text-white text-center py-3" style="position:fixed;bottom:0;left:0;width:100%;z-index:1000;">
         &copy; {{ date('Y') }} MediConnectHub. Tous droits réservés.
     </footer>
 

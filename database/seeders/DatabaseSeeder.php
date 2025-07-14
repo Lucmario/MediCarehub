@@ -14,8 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // S'assurer que le rôle 'admin' existe
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
         // S'assurer que le rôle 'doctor' existe
         $doctorRole = Role::firstOrCreate(['name' => 'doctor']);
+        // S'assurer que le rôle 'patient' existe
+        $patientRole = Role::firstOrCreate(['name' => 'patient']);
 
         // Exemple de seed pour des docteurs de différentes spécialités
         $doctorsData = [
@@ -55,6 +59,7 @@ class DatabaseSeeder extends Seeder
             $user = User::create([
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
+                'name' => $data['firstname'] . ' ' . $data['lastname'],
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role_id' => $data['role_id'],
@@ -101,6 +106,7 @@ class DatabaseSeeder extends Seeder
             $user = User::create([
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
+                'name' => $data['firstname'] . ' ' . $data['lastname'],
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role_id' => $data['role_id'],
@@ -110,6 +116,25 @@ class DatabaseSeeder extends Seeder
                 'specialty' => $data['specialty'],
                 'phone' => $data['phone'],
             ]);
+        }
+
+        // Création de l'utilisateur administrateur unique
+        $adminEmail = 'mediconnect.bj@gmail.com';
+        if (!User::where('email', $adminEmail)->exists()) {
+            User::create([
+                'firstname' => 'Luc Mario',
+                'lastname' => 'Lokossou',
+                'name' => 'Luc Mario Lokossou',
+                'email' => $adminEmail,
+                'password' => bcrypt('Medic@Hub2025'),
+                'role_id' => $adminRole->id,
+            ]);
+        } else {
+            // Si l'utilisateur existe déjà, on force son rôle à admin et on met à jour le mot de passe
+            $admin = User::where('email', $adminEmail)->first();
+            $admin->role_id = $adminRole->id;
+            $admin->password = bcrypt('Medic@Hub2025');
+            $admin->save();
         }
     }
 }

@@ -93,8 +93,34 @@
                     </button>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->firstname . ' ' . Auth::user()->lastname) . '&background=0d6efd&color=fff' }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white">
-                    <span class="font-medium">{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</span>
+                    @auth
+                        @php
+                            $user = Auth::user();
+                            $avatarUrl = $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->firstname . ' ' . $user->lastname) . '&background=0d6efd&color=fff';
+                            $hour = now()->format('H');
+                            if ($hour < 12) {
+                                $greeting = 'Bonjour';
+                            } elseif ($hour < 18) {
+                                $greeting = 'Bon après-midi';
+                            } else {
+                                $greeting = 'Bonsoir';
+                            }
+                            $roleLabel = '';
+                            if ($user->role && $user->role->name === 'doctor') {
+                                $roleLabel = 'Dr. ';
+                            } elseif ($user->role && $user->role->name === 'pharmacist') {
+                                $roleLabel = 'Pharmacien ';
+                            } elseif ($user->role && $user->role->name === 'patient') {
+                                $roleLabel = '';
+                            }
+                        @endphp
+                    @endauth
+                    @auth
+                        <img src="{{ $avatarUrl }}" class="w-10 h-10 rounded-full" alt="Avatar">
+                        <span class="font-medium">{{ $user->firstname }} {{ $user->lastname }}</span>
+                    @else
+                        <span class="font-medium">Invité</span>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -113,9 +139,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('appointments.create') }}" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
+                        <a href="{{ route('admin.appointments') }}" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100">
                             <i class="fas fa-calendar-check text-lg"></i>
-                            <span>Prendre RDV</span>
+                            <span>Gérer les rendez-vous</span>
                         </a>
                     </li>
                     <li>
@@ -166,9 +192,20 @@
             <!-- Welcome Banner -->
             <div class="gradient-bg text-white rounded-xl p-6 mb-6 shadow-lg">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-2">Bonjour, {{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</h2>
-                        <p class="opacity-90">Bienvenue sur votre espace personnel MediConnectHub</p>
+                    <div class="flex items-center space-x-4">
+                        @auth
+                            <img src="{{ $avatarUrl }}" class="w-14 h-14 rounded-full border-2 border-white" alt="Avatar">
+                        @endauth
+                        <div>
+                            <h2 class="text-2xl font-bold mb-2">
+                                @auth
+                                    {{ $greeting }}, {{ $roleLabel }}{{ $user->firstname }} {{ $user->lastname }}
+                                @else
+                                    Bienvenue, Invité
+                                @endauth
+                            </h2>
+                            <p class="opacity-90">Bienvenue sur votre espace personnel MediConnectHub</p>
+                        </div>
                     </div>
                     <button id="arrivalBtn" class="mt-4 md:mt-0 bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg hover:bg-gray-100 transition flex items-center space-x-2">
                         <i class="fas fa-check-circle"></i>
@@ -361,12 +398,12 @@
             
             <!-- Quick Actions -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <button class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col items-center">
+                <a href="{{ route('admin.appointments') }}" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col items-center">
                     <div class="bg-blue-100 p-3 rounded-full mb-2">
                         <i class="fas fa-calendar-plus text-blue-600 text-xl"></i>
                     </div>
-                    <span class="text-sm font-medium text-center">Prendre RDV</span>
-                </button>
+                    <span class="text-sm font-medium text-center">Gérer les rendez-vous</span>
+                </a>
                 <button class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col items-center">
                     <div class="bg-green-100 p-3 rounded-full mb-2">
                         <i class="fas fa-file-medical text-green-600 text-xl"></i>
@@ -386,6 +423,35 @@
                     <span class="text-sm font-medium text-center">Aide</span>
                 </button>
             </div>
+
+            @auth
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    @if($user->role && $user->role->name === 'admin')
+                        <a href="{{ route('users.index') }}" class="bg-blue-600 text-white p-6 rounded-lg shadow hover:bg-blue-700 flex flex-col items-center">
+                            <i class="fas fa-users text-3xl mb-2"></i>
+                            <span class="font-semibold">Gérer les utilisateurs</span>
+                        </a>
+                    @endif
+                    @if($user->role && $user->role->name === 'doctor')
+                        <a href="{{ route('consultations.index') }}" class="bg-teal-600 text-white p-6 rounded-lg shadow hover:bg-teal-700 flex flex-col items-center">
+                            <i class="fas fa-stethoscope text-3xl mb-2"></i>
+                            <span class="font-semibold">Mes consultations</span>
+                        </a>
+                    @endif
+                    @if($user->role && $user->role->name === 'patient')
+                        <a href="{{ route('medical-records.index') }}" class="bg-green-600 text-white p-6 rounded-lg shadow hover:bg-green-700 flex flex-col items-center">
+                            <i class="fas fa-file-medical text-3xl mb-2"></i>
+                            <span class="font-semibold">Mon dossier médical</span>
+                        </a>
+                    @endif
+                    @if($user->role && $user->role->name === 'pharmacist')
+                        <a href="#" class="bg-yellow-500 text-white p-6 rounded-lg shadow hover:bg-yellow-600 flex flex-col items-center">
+                            <i class="fas fa-capsules text-3xl mb-2"></i>
+                            <span class="font-semibold">Ordonnances à valider</span>
+                        </a>
+                    @endif
+                </div>
+            @endauth
         </main>
     </div>
     

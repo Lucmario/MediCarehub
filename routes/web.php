@@ -17,18 +17,23 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Models\Doctor;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\FedaPayController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 // Accueil (page d'accueil nommée 'home')
-Route::get('/', function () {
-    $doctors = Doctor::with('user')->get();
-    return view('welcome', compact('doctors'));
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Dashboard Admin
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 // Dashboard général
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Dashboards personnalisés
+Route::get('/patient/dashboard', [App\Http\Controllers\PatientController::class, 'dashboardPatient'])->name('patient.dashboard');
+Route::get('/doctor/dashboard', [App\Http\Controllers\DoctorController::class, 'dashboardDoctor'])->name('doctor.dashboard');
+Route::get('/pharmacist/dashboard', [App\Http\Controllers\PharmacistController::class, 'dashboardPharmacist'])->name('pharmacist.dashboard');
 
 // Routes ressources pour chaque entité
 Route::middleware('auth')->group(function () {
@@ -57,6 +62,10 @@ Route::post('/register/{role}', [AuthController::class, 'register'])->name('regi
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
+// Connexion Admin
+Route::get('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'login'])->name('admin.login.submit');
+
 // Profil
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [AuthController::class, 'editProfile'])->name('profile.edit');
@@ -79,3 +88,125 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect()->route('login');
 })->name('logout');
+Route::post('/admin/logout', [\App\Http\Controllers\Admin\AdminAuthController::class, 'logout'])->name('admin.logout');
+
+// Paiement FedaPay
+Route::post('/fedapay/pay', [FedaPayController::class, 'initiatePayment'])->name('fedapay.pay');
+Route::get('/fedapay/callback', function() {
+    // Ici, tu pourras traiter la notification de paiement (callback serveur à serveur)
+    return response()->json(['status' => 'callback reçu']);
+})->name('fedapay.callback');
+Route::get('/fedapay/return', function() {
+    // Ici, tu pourras afficher un message de succès ou d'échec à l'utilisateur
+    return view('fedapay.return');
+})->name('fedapay.return');
+
+Route::get('/fedapay/form', function() {
+    return view('fedapay_form');
+});
+
+// Réinitialisation du mot de passe
+Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+// Exemple carte OSM/Leaflet
+Route::get('/map-example', function () {
+    return view('map-example');
+})->name('map.example');
+
+// Prise de rendez-vous patient : choix spécialité
+Route::get('/appointments/request', [App\Http\Controllers\AppointmentController::class, 'requestForm'])->name('appointments.request');
+// Prise de rendez-vous : enregistrement
+Route::post('/appointments/book', [App\Http\Controllers\AppointmentController::class, 'book'])->name('appointments.book');
+
+// Actions sur les rendez-vous (médecin)
+Route::post('/doctor/appointments/{appointment}/confirm', [App\Http\Controllers\DoctorController::class, 'confirmAppointment'])->name('doctor.appointments.confirm');
+Route::post('/doctor/appointments/{appointment}/refuse', [App\Http\Controllers\DoctorController::class, 'refuseAppointment'])->name('doctor.appointments.refuse');
+// Action sur les ordonnances
+Route::post('/doctor/prescriptions/{prescription}/validate', [App\Http\Controllers\DoctorController::class, 'validatePrescription'])->name('doctor.prescriptions.validate');
+// Historique complet
+Route::get('/doctor/history', [App\Http\Controllers\DoctorController::class, 'history'])->name('doctor.history');
+// Historique complet pharmacien
+Route::get('/pharmacist/history', [App\Http\Controllers\PharmacistController::class, 'history'])->name('pharmacist.history');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/teleconsultation/{room}', function($room) {
+        $user = Auth::user();
+        $allowedRoles = ['patient', 'doctor', 'pharmacist'];
+        if (!in_array($user->role->name, $allowedRoles)) {
+            abort(403, 'Accès refusé à la téléconsultation.');
+        }
+        return view('teleconsultation.room', compact('room'));
+    })->name('teleconsultation.room');
+});
+
+// Route temporaire pour la démo de visioconférence patient/médecin
+Route::get('/teleconsultation-demo', function() {
+    return view('teleconsultation.demo');
+})->name('teleconsultation.demo');
+
+// Route temporaire pour la démo de prescription de médicaments
+Route::get('/prescription-demo', function() {
+    return view('prescriptions.demo');
+})->name('prescriptions.demo');
+
+// Route temporaire pour la démo d'enregistrement de dossier médical patient
+Route::get('/medical-record-demo', function() {
+    return view('medical-records.demo');
+})->name('medical-records.demo');
+
+// Route de test simple
+Route::get('/test', function() { return 'Test OK'; });
+// Route de test de vue
+Route::get('/test-view', function() {
+    $doctors = \App\Models\Doctor::with('user')->get();
+    return view('welcome', compact('doctors'));
+});
+Route::get('/test-login', function() { return view('auth.login'); });
+Route::get('/test-admin-login', function() { return view('auth.admin-login'); });
+
+// Gestion des rendez-vous pour l'admin
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/appointments', [\App\Http\Controllers\Admin\DashboardController::class, 'appointments'])->name('admin.appointments');
+    Route::delete('/admin/appointments/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'destroyAppointment'])->name('admin.appointments.delete');
+    Route::get('/admin/appointments/{id}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editAppointment'])->name('admin.appointments.edit');
+    Route::post('/admin/appointments/{id}/update', [\App\Http\Controllers\Admin\DashboardController::class, 'updateAppointment'])->name('admin.appointments.update');
+});
+
+// Route temporaire pour reset le mot de passe d'un utilisateur spécifique
+Route::get('/dev-reset-mdp', function() {
+    $u = \App\Models\User::where('email', 'mediconnect.bj@gmail.com')->first();
+    if ($u) {
+        $u->password = bcrypt('nouveaumdp2024');
+        $u->save();
+        return 'Mot de passe réinitialisé !';
+    }
+    return 'Utilisateur non trouvé.';
+});
+
+// Route temporaire pour corriger le nom du rôle id=3 en 'patient'
+Route::get('/dev-fix-role-patient', function() {
+    $role = \App\Models\Role::find(3);
+    if ($role) {
+        $role->name = 'patient';
+        $role->save();
+        return 'Rôle corrigé : id=3 => patient';
+    }
+    return 'Rôle id=3 non trouvé.';
+});
+
+// Route temporaire pour corriger complètement le compte patient
+Route::get('/dev-fix-patient', function() {
+    $user = \App\Models\User::where('email', 'mediconnect.bj@gmail.com')->first();
+    $role = \App\Models\Role::where('name', 'patient')->first();
+    if ($user && $role) {
+        $user->password = bcrypt('nouveaumdp2024');
+        $user->role_id = $role->id;
+        if (isset($user->active_status)) $user->active_status = 1;
+        $user->save();
+        return 'Patient corrigé : mot de passe = nouveaumdp2024, rôle = patient, compte activé.';
+    }
+    return 'Utilisateur ou rôle patient non trouvé.';
+});

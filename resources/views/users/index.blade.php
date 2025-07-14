@@ -1,3 +1,6 @@
+@php
+    $adminEmail = 'lucmariolokossou@gmail.com';
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -25,15 +28,26 @@
                 <td>{{ $user->lastname }}</td>
                 <td>{{ $user->firstname }}</td>
                 <td>{{ $user->email }}</td>
-                <td>{{ $user->role->name ?? 'Non défini' }}</td>
+                <td>
+                    @if($user->email === $adminEmail)
+                        <span class="badge bg-danger">Admin</span>
+                    @else
+                        {{ $user->role->name ?? 'Non défini' }}
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('users.show', $user) }}" class="btn btn-info btn-sm">Voir</a>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Modifier</a>
-                    <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</button>
-                    </form>
+                    @if($user->email !== $adminEmail)
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</button>
+                        </form>
+                    @else
+                        <button class="btn btn-secondary btn-sm" disabled>Modifier</button>
+                        <button class="btn btn-secondary btn-sm" disabled>Supprimer</button>
+                    @endif
                 </td>
             </tr>
             @endforeach

@@ -1,3 +1,6 @@
+@php
+    $doctors = $doctors ?? collect();
+@endphp
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -205,6 +208,15 @@
     </a>
   </section>
 
+  <!-- Carte OpenStreetMap avec Leaflet (localisation hôpitaux et pharmacies) -->
+  <section class="py-16 px-6 bg-white" id="map-section">
+    <h2 class="text-3xl font-bold mb-8 text-blue-800 text-center">Localisation des hôpitaux et pharmacies proches</h2>
+    <div class="flex justify-center">
+      <div id="map-main" style="height: 400px; width: 100%; max-width: 900px;"></div>
+    </div>
+    <p class="mt-4 text-center text-sm text-gray-500">Sources OpenStreetMap et base MediConnectHub.</p>
+  </section>
+
   <!-- Footer -->
   <footer class="bg-blue-900 text-white py-6 text-center">
     <p>&copy; {{ date('Y') }} MediConnectHub. Tous droits réservés.</p>
@@ -217,6 +229,9 @@
 
   <!-- Swiper JS -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <!-- Init AOS & Swiper -->
   <script>
     AOS.init({ duration: 1000, once: true });
@@ -232,6 +247,63 @@
         1024: { slidesPerView: 3 }
       }
     });
+  </script>
+  <script>
+    // Exemple de données (à remplacer par vos données dynamiques)
+    var hospitals = [
+      { name: 'Hôpital de Cotonou', lat: 6.3703, lng: 2.3912 },
+      { name: 'Hôpital St Jean', lat: 6.3720, lng: 2.3900 },
+      { name: 'Hôpital Zogbo', lat: 6.3550, lng: 2.4050 }
+    ];
+    var pharmacies = [
+      { name: 'Pharmacie Centrale', lat: 6.3703, lng: 2.3950 },
+      { name: 'Pharmacie du Port', lat: 6.3680, lng: 2.3920 },
+      { name: 'Pharmacie Zogbo', lat: 6.3555, lng: 2.4060 }
+    ];
+    // Fonction de calcul de distance (Haversine)
+    function getDistance(lat1, lon1, lat2, lon2) {
+      function toRad(x) { return x * Math.PI / 180; }
+      var R = 6371; // km
+      var dLat = toRad(lat2-lat1);
+      var dLon = toRad(lon2-lon1);
+      var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+    var mapMain = L.map('map-main').setView([6.3703, 2.3912], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(mapMain);
+    // Géolocalisation utilisateur
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var userLat = position.coords.latitude;
+        var userLng = position.coords.longitude;
+        mapMain.setView([userLat, userLng], 14);
+        L.marker([userLat, userLng], {icon: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png', iconSize: [32,32]})})
+          .addTo(mapMain)
+          .bindPopup('Vous êtes ici').openPopup();
+        // Afficher hôpitaux proches (<= 10km)
+        hospitals.forEach(function(h) {
+          var dist = getDistance(userLat, userLng, h.lat, h.lng);
+          if (dist <= 10) {
+            L.marker([h.lat, h.lng], {icon: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/2967/2967350.png', iconSize: [28,28]})})
+              .addTo(mapMain)
+              .bindPopup(h.name + ' (Hôpital)<br>Distance : ' + dist.toFixed(2) + ' km');
+          }
+        });
+        // Afficher pharmacies proches (<= 10km)
+        pharmacies.forEach(function(p) {
+          var dist = getDistance(userLat, userLng, p.lat, p.lng);
+          if (dist <= 10) {
+            L.marker([p.lat, p.lng], {icon: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/2972/2972185.png', iconSize: [28,28]})})
+              .addTo(mapMain)
+              .bindPopup(p.name + ' (Pharmacie)<br>Distance : ' + dist.toFixed(2) + ' km');
+          }
+        });
+      });
+    }
   </script>
 </body>
 </html>

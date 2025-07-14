@@ -34,6 +34,7 @@ class UserController extends Controller
         User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
+            'name' => $request->firstname . ' ' . $request->lastname,
             'email' => $request->email,
             'role_id' => $request->role_id,
             'password' => Hash::make($request->password),
@@ -82,12 +83,13 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
+        $patientRole = \App\Models\Role::where('name', 'patient')->first();
         $user = User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 1, // ID du rôle patient
+            'role_id' => $patientRole ? $patientRole->id : null,
         ]);
         // Ajoute ici la logique pour créer le patient si besoin
         return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');
@@ -103,12 +105,13 @@ class UserController extends Controller
             'specialty' => 'required',
             'password' => 'required|confirmed|min:6',
         ]);
+        $doctorRole = \App\Models\Role::where('name', 'doctor')->first();
         $user = User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 2, // ID du rôle médecin
+            'role_id' => $doctorRole ? $doctorRole->id : null,
         ]);
         // Ajoute ici la logique pour créer le médecin (Doctor::create...)
         return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');
@@ -123,12 +126,13 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
+        $pharmacistRole = \App\Models\Role::where('name', 'pharmacist')->first();
         $user = User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 3, // ID du rôle pharmacien/caissier
+            'role_id' => $pharmacistRole ? $pharmacistRole->id : null,
         ]);
         // Ajoute ici la logique pour créer le pharmacien/caissier si besoin
         return redirect()->route('login')->with('success', 'Inscription réussie, veuillez vous connecter.');

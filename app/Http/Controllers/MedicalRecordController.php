@@ -12,7 +12,15 @@ class MedicalRecordController extends Controller
     public function index()
     {
         try {
-            $records = MedicalRecord::with('patient')->get();
+            $user = auth()->user();
+            // Si l'utilisateur est patient, ne voir que ses dossiers
+            if ($user && $user->role && $user->role->name === 'patient') {
+                $patient = \App\Models\Patient::where('user_id', $user->id)->first();
+                $records = $patient ? MedicalRecord::where('patient_id', $patient->id)->with('patient')->get() : collect();
+            } else {
+                // Pour les autres rôles, voir tous les dossiers
+                $records = MedicalRecord::with('patient')->get();
+            }
             Log::info('Dossiers médicaux récupérés : ' . $records->count());
             return view('medical-records.index', compact('records'));
         } catch (\Exception $e) {

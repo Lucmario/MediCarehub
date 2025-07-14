@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
 {
@@ -56,5 +57,41 @@ class PatientController extends Controller
     {
         $patient->delete();
         return redirect()->route('patients.index')->with('success', 'Patient supprimé.');
+    }
+
+    public function dashboardPatient()
+    {
+        $user = Auth::user();
+        $patient = $user->patient ?? null;
+        $upcomingAppointments = collect();
+        $recentPrescriptions = collect();
+        $stats = [
+            'appointments' => 0,
+            'consultations' => 0,
+            'prescriptions' => 0,
+        ];
+        $notifications = [];
+        if ($patient) {
+            $upcomingAppointments = \App\Models\Appointment::with(['doctor.user'])
+                ->where('patient_id', $patient->id)
+                ->where('date', '>=', now()->toDateString())
+                ->orderBy('date')
+                ->orderBy('heure')
+                ->get();
+            $recentPrescriptions = \App\Models\Prescription::whereHas('consultation', function($q) use ($patient) {
+                $q->where('patient_id', $patient->id);
+            })->orderByDesc('id')->take(5)->get();
+            $stats['appointments'] = \App\Models\Appointment::where('patient_id', $patient->id)->count();
+            $stats['consultations'] = \App\Models\Consultation::where('patient_id', $patient->id)->count();
+            $stats['prescriptions'] = \App\Models\Prescription::whereHas('consultation', function($q) use ($patient) {
+                $q->where('patient_id', $patient->id);
+            })->count();
+            // Notification prochain RDV
+            $nextRdv = $upcomingAppointments->first();
+            if ($nextRdv) {
+                $notifications[] = 'Prochain rendez-vous le ' . \Carbon\Carbon::parse($nextRdv->date)->format('d/m/Y') . ' à ' . $nextRdv->heure . ' avec Dr ' . $nextRdv->doctor->user->firstname . ' ' . $nextRdv->doctor->user->lastname;
+            }
+        }
+        return view('patient.dashboard', compact('upcomingAppointments', 'recentPrescriptions', 'stats', 'notifications'));
     }
 }
